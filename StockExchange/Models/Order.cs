@@ -14,7 +14,7 @@ namespace StockExchange.Models
             this.OrderCreationTime = DateTime.Parse(time);
             this.StockName = stockName;
             this.OrderType = (OrderType)Enum.Parse(typeof(OrderType), stockType, true);
-            this.OrderPrice = double.Parse(stockPrice);
+            this.OrderPrice = decimal.Parse(stockPrice);
             this.OrderQuantity = Int32.Parse(stockQuantity);
         }
         public Order(Order order)
@@ -31,7 +31,7 @@ namespace StockExchange.Models
         public DateTime OrderCreationTime { get; set; }
         public string StockName { get; set; }
         public OrderType OrderType { get; set; }
-        public double OrderPrice { get; set; }
+        public decimal OrderPrice { get; set; }
         public int OrderQuantity { get; set; }
     }
 }
