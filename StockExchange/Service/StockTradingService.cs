@@ -16,36 +16,19 @@ namespace StockExchange.Service
 
         public void AddStockDetails(string stockDetail)
         {
-            var stockInfo = stockDetail.Split(' ');
-            var (stockOrderId, time, stockName, stockType, stockPrice, stockQuantity) =
-                (stockInfo[0], stockInfo[1], stockInfo[2], stockInfo[3], stockInfo[4], stockInfo[5]);
+            StockOrderMatching stockOrder;
+            Order order = ParseStockOrder(stockDetail);
 
-            Order order = new Order(stockOrderId, time, stockName, stockType, stockPrice, stockQuantity);
-
-            if(_stockMatchingMap.ContainsKey(stockName))
+            if(!_stockMatchingMap.ContainsKey(order.StockName))
             {
-                StockOrderMatching stockOrder = _stockMatchingMap[stockName];
-                if (order.OrderType == OrderType.Buy)
-                {
-                    stockOrder.BuyOrders.Add(order);
-                    stockOrder.GenerateReceiptForStock();
-                }
-                else
-                    stockOrder.SellOrders.Add(order);
+                stockOrder = new StockOrderMatching();
+                _stockMatchingMap.Add(order.StockName, stockOrder);
             }
-            else
-            {
-                StockOrderMatching stockOrder = new StockOrderMatching();
-                if (order.OrderType == OrderType.Buy)
-                {
-                    stockOrder.BuyOrders.Add(order);
-                    stockOrder.GenerateReceiptForStock();
-                }
-                else
-                    stockOrder.SellOrders.Add(order);
 
-                _stockMatchingMap.Add(stockName, stockOrder);
-            }
+            stockOrder = _stockMatchingMap[order.StockName];
+            AddStockToOrderBook(stockOrder, order);
+
+            stockOrder.GenerateReceiptForStock();
 
         }
 
@@ -56,6 +39,24 @@ namespace StockExchange.Service
                 var stockMatchingEntry = stock.Value;
                 stockMatchingEntry.GenerateReceiptForStock();
             }
+        }
+
+        public void AddStockToOrderBook(StockOrderMatching stockOrderBook, Order order)
+        {
+            if (order.OrderType == OrderType.Buy)
+            {
+                stockOrderBook.BuyOrders.Add(order);
+                return;
+            }
+            stockOrderBook.SellOrders.Add(order);
+        }
+        private Order ParseStockOrder(string stockDetail)
+        {
+            var stockInfo = stockDetail.Split(' ');
+            var (stockOrderId, time, stockName, stockType, stockPrice, stockQuantity) =
+                (stockInfo[0], stockInfo[1], stockInfo[2], stockInfo[3], stockInfo[4], stockInfo[5]);
+            Order order = new Order(stockOrderId, time, stockName, stockType, stockPrice, stockQuantity);
+            return order;
         }
     }
 }

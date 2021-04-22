@@ -9,16 +9,16 @@ namespace StockExchange.App
         static void Main(string[] args)
         {
             Console.WriteLine("Hello World!");
-            StockTradingService obj = new StockTradingService();
+            StockTradingService trade = new StockTradingService();
             //var fileData = File.ReadAllLines("input/input.txt");
             string line;
             System.IO.StreamReader file = new System.IO.StreamReader(@"input/input.txt");
             while ((line = file.ReadLine()) != null)
             {
-                obj.AddStockDetails(line);
+                trade.AddStockDetails(line);
             }
 
-           obj.GenerateReceipt();
+           trade.GenerateReceipt();
 
             file.Close();
 
