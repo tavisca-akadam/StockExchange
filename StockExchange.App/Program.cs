@@ -1,6 +1,7 @@
 ﻿using StockExchange.Service;
 using System;
 using System.IO;
+using System.Reflection;
 
 namespace StockExchange.App
 {
@@ -8,22 +9,35 @@ namespace StockExchange.App
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
-            StockTradingService trade = new StockTradingService();
-            //var fileData = File.ReadAllLines("input/input.txt");
+            string fileName = args[0];
+
+            if (string.IsNullOrEmpty(fileName))
+                throw new InvalidOperationException();
+
+            FileStream fileStream = new FileStream(fileName, FileMode.Open);
+            StockTradingService tradingService = new StockTradingService();
             string line;
-            System.IO.StreamReader file = new System.IO.StreamReader(@"input/input.txt");
-            while ((line = file.ReadLine()) != null)
+            
+            using(StreamReader reader = new StreamReader(fileStream))
             {
-                trade.AddStockDetails(line);
+                while ((line = reader.ReadLine()) != null)
+                {
+                    var order = tradingService.AddStockDetails(line);
+                    try
+                    {
+                        var output = tradingService.DoTrade(order);
+                        if (!string.IsNullOrEmpty(output))
+                            Console.WriteLine(output);
+                    }
+                    catch(Exception ex)
+                    {
+                        Console.WriteLine(ex);
+                    }
+                }
+
             }
 
-           trade.GenerateReceipt();
-
-            file.Close();
-
-            //File.WriteAllLines("../../../output/output.txt", fileData);
-
+           fileStream.Close();
         }
     }
 }
