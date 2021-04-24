@@ -11,23 +11,24 @@ namespace StockExchange.Service
     {
         public SortedSet<Order> BuyOrders { get; }
         public SortedSet<Order> SellOrders { get; }
-
+        private List<string> ExchangeReciept { get; set; }
         public StockExchangeService()
         {
             BuyOrders = new SortedSet<Order>(new BuyStockPriceComparer());
             SellOrders = new SortedSet<Order>(new SellStockPriceComparer());
+            ExchangeReciept = new List<string>();
         }
 
-        public string Exchange()
+        public List<string> Exchange()
         {
-            string exchangeReceipt = "";
+            string exchangeReceiptLog = "";
             while (BuyOrders.Count > 0 && SellOrders.Count > 0)
             {
                 Order buyOrder = BuyOrders.First(), sellOrder = SellOrders.First();
 
                 if (buyOrder.OrderPrice >= sellOrder.OrderPrice)
                 {
-                    exchangeReceipt = $"{buyOrder.Id}  {sellOrder.OrderPrice} {GetUpdatedQuantity(buyOrder.OrderQuantity, sellOrder.OrderQuantity)} {sellOrder.Id}.";
+                    exchangeReceiptLog = $"{buyOrder.Id}  {sellOrder.OrderPrice} {GetUpdatedQuantity(buyOrder.OrderQuantity, sellOrder.OrderQuantity)} {sellOrder.Id}.";
 
                     if (buyOrder.OrderQuantity > sellOrder.OrderQuantity)
                     {
@@ -42,8 +43,14 @@ namespace StockExchange.Service
                 }
                 else
                     break;
+                if(!string.IsNullOrEmpty(exchangeReceiptLog))
+                {
+                    Console.WriteLine(exchangeReceiptLog);
+                    ExchangeReciept.Add(exchangeReceiptLog);
+                    exchangeReceiptLog = "";
+                }
             }
-            return exchangeReceipt;
+            return ExchangeReciept;
         }
 
         private int GetUpdatedQuantity(int buyOrderQuantity, int sellOrderQuantity)

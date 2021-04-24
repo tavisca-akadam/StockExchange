@@ -17,10 +17,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Output\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\StockExchange\StockExchange.csproj" />
   </ItemGroup>
 

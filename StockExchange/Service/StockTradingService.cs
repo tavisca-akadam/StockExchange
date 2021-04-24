@@ -9,7 +9,7 @@ namespace StockExchange.Service
     public class StockTradingService
     {
         private Dictionary<string, StockExchangeService> _stockMatchingMap;
-
+        public List<string> RecordedExchange { get; set; }
         public StockTradingService()
         {
             _stockMatchingMap = new Dictionary<string, StockExchangeService>();
@@ -32,14 +32,16 @@ namespace StockExchange.Service
             return order;
         }
 
-        public string DoTrade(Order order)
+        public List<string> DoTrade(Order order)
         {
             if (order == null)
                 throw new InvalidOperationException("Order can not null or empty.");
             try
             {
                 var stockOrder = _stockMatchingMap[order.StockName];  
-                return stockOrder.Exchange();
+                RecordedExchange = stockOrder.Exchange();
+                return RecordedExchange;
+                
             }
             catch(Exception ex)
             {

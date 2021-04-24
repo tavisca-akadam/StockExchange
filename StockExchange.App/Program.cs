@@ -26,8 +26,6 @@ namespace StockExchange.App
                     try
                     {
                         var output = tradingService.DoTrade(order);
-                        if (!string.IsNullOrEmpty(output))
-                            Console.WriteLine(output);
                     }
                     catch(Exception ex)
                     {

@@ -52,7 +52,7 @@ namespace StockExchange.Test
             stockInfo = "#2 09:49 BAC buy 237.80 10";
             order = tradingService.AddStockDetails(stockInfo);
 
-            string output = tradingService.DoTrade(order);
+            var output = tradingService.DoTrade(order);
             Assert.NotNull(output);
         }
         [Fact]
@@ -65,7 +65,7 @@ namespace StockExchange.Test
             stockInfo = "#2 09:49 BAC sell 237.80 10";
             order = tradingService.AddStockDetails(stockInfo);
 
-            string output = tradingService.DoTrade(order);
+            var output = tradingService.DoTrade(order);
             Assert.NotNull(output);
         }
 
