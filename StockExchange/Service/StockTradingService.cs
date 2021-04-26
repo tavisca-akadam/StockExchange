@@ -1,61 +1,70 @@
 ﻿using StockExchange.Models;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace StockExchange.Service
 {
     public class StockTradingService
     {
-        private Dictionary<string, StockOrderMatching> _stockMatchingMap;
-
+        private Dictionary<string, StockExchangeService> _stockMatchingMap;
+        public List<string> RecordedExchange { get; set; }
         public StockTradingService()
         {
-            _stockMatchingMap = new Dictionary<string, StockOrderMatching>();
+            _stockMatchingMap = new Dictionary<string, StockExchangeService>();
         }
 
-        public void AddStockDetails(string stockDetail)
+        public Order AddStockDetails(string stockDetail)
         {
-            var stockInfo = stockDetail.Split(' ');
+            StockExchangeService stockOrder;
+            Order order = ParseStockOrder(stockDetail);
+
+            if(!_stockMatchingMap.ContainsKey(order.StockName))
+            {
+                stockOrder = new StockExchangeService();
+                _stockMatchingMap.Add(order.StockName, stockOrder);
+            }
+
+            stockOrder = _stockMatchingMap[order.StockName];
+            AddStockToOrderBook(stockOrder, order);         
+
+            return order;
+        }
+
+        public List<string> DoTrade(Order order)
+        {
+            if (order == null)
+                throw new InvalidOperationException("Order can not null or empty.");
+            try
+            {
+                var stockOrder = _stockMatchingMap[order.StockName];  
+                RecordedExchange = stockOrder.Exchange();
+                return RecordedExchange;
+                
+            }
+            catch(Exception ex)
+            {
+                throw new KeyNotFoundException("Stock order not found.");
+            }
+        }
+
+        private void AddStockToOrderBook(StockExchangeService stockOrderBook, Order order)
+        {
+            if (order.OrderType == OrderType.Buy)
+            {
+                stockOrderBook.BuyOrders.Add(order);
+                return;
+            }
+            stockOrderBook.SellOrders.Add(order);
+        }
+        private Order ParseStockOrder(string stockDetail)
+        {
+            var stockInfo = System.Text.RegularExpressions.Regex.Split(stockDetail, @"\s+"); ;
             var (stockOrderId, time, stockName, stockType, stockPrice, stockQuantity) =
                 (stockInfo[0], stockInfo[1], stockInfo[2], stockInfo[3], stockInfo[4], stockInfo[5]);
-
             Order order = new Order(stockOrderId, time, stockName, stockType, stockPrice, stockQuantity);
-
-            if(_stockMatchingMap.ContainsKey(stockName))
-            {
-                StockOrderMatching stockOrder = _stockMatchingMap[stockName];
-                if (order.OrderType == OrderType.Buy)
-                {
-                    stockOrder.BuyOrders.Add(order);
-                    stockOrder.GenerateReceiptForStock();
-                }
-                else
-                    stockOrder.SellOrders.Add(order);
-            }
-            else
-            {
-                StockOrderMatching stockOrder = new StockOrderMatching();
-                if (order.OrderType == OrderType.Buy)
-                {
-                    stockOrder.BuyOrders.Add(order);
-                    stockOrder.GenerateReceiptForStock();
-                }
-                else
-                    stockOrder.SellOrders.Add(order);
-
-                _stockMatchingMap.Add(stockName, stockOrder);
-            }
-
-        }
-
-        public void GenerateReceipt()
-        {
-            foreach(var stock in _stockMatchingMap)
-            {
-                var stockMatchingEntry = stock.Value;
-                stockMatchingEntry.GenerateReceiptForStock();
-            }
+            return order;
         }
     }
 }

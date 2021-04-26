@@ -1,8 +1,9 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.1</TargetFramework>
+    <AssemblyName>geektrust</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
@@ -13,10 +14,6 @@
     <EmbeddedResource Include="Input\input.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Output\" />
   </ItemGroup>
 
   <ItemGroup>
